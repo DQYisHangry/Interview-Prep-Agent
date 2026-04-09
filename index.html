@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>面试准备 Agent</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Lato:wght@300;400;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0f0e0c;
+      --surface:  #1a1916;
+      --border:   #2e2c28;
+      --gold:     #d4a84b;
+      --gold-dim: #7a5e28;
+      --text:     #e8e4dc;
+      --muted:    #7a7670;
+      --green:    #4caf7d;
+      --red:      #e05c5c;
+      --r: 8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Lato', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 72px 24px 56px;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .eyebrow {
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: clamp(2.6rem, 6vw, 4.2rem);
+      line-height: 1.08;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+
+    h1 span { color: var(--gold); }
+
+    .hero-sub {
+      font-size: 15px;
+      color: var(--muted);
+      line-height: 1.75;
+      max-width: 520px;
+    }
+
+    /* ── INPUT PANEL ── */
+    .panel {
+      max-width: 860px;
+      margin: 0 auto 0;
+      padding: 0 24px 64px;
+    }
+
+    .input-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 32px;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media(max-width:600px){ .fields { grid-template-columns: 1fr; } }
+
+    .field label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .field input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: 'Lato', sans-serif;
+      font-size: 14px;
+      padding: 11px 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .field input:focus { border-color: var(--gold); }
+    .field input::placeholder { color: #45433e; }
+
+    .go-btn {
+      background: var(--gold);
+      color: #0f0e0c;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 15px;
+      padding: 13px 32px;
+      cursor: pointer;
+      transition: opacity .2s, transform .1s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .go-btn:hover { opacity: .88; }
+    .go-btn:active { transform: scale(.97); }
+    .go-btn:disabled { opacity: .4; cursor: not-allowed; }
+
+    /* progress */
+    .progress {
+      display: none;
+      margin-top: 24px;
+      gap: 10px;
+      flex-direction: column;
+    }
+    .progress.show { display: flex; }
+
+    .prog-step {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px; color: var(--muted);
+      letter-spacing: .04em;
+    }
+    .prog-step.active { color: var(--gold); }
+    .prog-step.done   { color: var(--green); }
+
+    .prog-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--border); flex-shrink: 0;
+    }
+    .prog-step.active .prog-dot {
+      background: var(--gold);
+      animation: glow 1s infinite;
+    }
+    .prog-step.done .prog-dot { background: var(--green); }
+    @keyframes glow {
+      0%,100% { box-shadow: 0 0 0 0 rgba(212,168,75,.5); }
+      50%      { box-shadow: 0 0 0 5px rgba(212,168,75,0); }
+    }
+
+    /* ── REPORT ── */
+    #report { display: none; max-width: 860px; margin: 0 auto; padding: 0 24px 80px; }
+    #report.show { display: block; }
+
+    /* company snapshot */
+    .snapshot {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      align-items: start;
+    }
+
+    .co-name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .co-liner { font-size: 14px; color: var(--muted); margin-bottom: 14px; }
+
+    .meta-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .highlights { margin-top: 14px; }
+    .highlight-item {
+      display: flex; align-items: flex-start; gap: 8px;
+      font-size: 13px; color: #a09c94;
+      margin-bottom: 6px; line-height: 1.6;
+    }
+    .highlight-item::before { content: '→'; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+
+    /* section heading */
+    .sec-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: .04em;
+      margin-bottom: 14px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* culture signals */
+    .culture-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .culture-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+      animation: fadeUp .4s ease both;
+    }
+
+    .culture-trait {
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .culture-evidence {
+      font-size: 12px; color: var(--muted); line-height: 1.65;
+      margin-bottom: 10px;
+      border-left: 2px solid var(--gold-dim);
+      padding-left: 10px;
+    }
+
+    .culture-angle {
+      font-size: 12px; color: var(--green); line-height: 1.6;
+    }
+
+    .culture-angle::before { content: '💡 '; }
+
+    /* questions */
+    .q-list { margin-bottom: 20px; }
+
+    .q-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 22px 24px;
+      margin-bottom: 12px;
+      animation: fadeUp .4s ease both;
+    }
+
+    .q-item:hover { border-color: var(--gold-dim); }
+
+    .q-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      color: #fff;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+
+    .q-why {
+      font-size: 12px; color: var(--muted);
+      background: rgba(255,255,255,.03);
+      border-radius: 4px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
+      line-height: 1.65;
+    }
+    .q-why::before { content: 'WHY: '; color: var(--gold); font-weight: 700; letter-spacing: .06em; }
+
+    .q-tip {
+      font-size: 13px; color: #c8c2b8;
+      line-height: 1.75;
+      border-top: 1px solid var(--border);
+      padding-top: 10px;
+    }
+    .q-tip::before { content: '✦ 回答思路  '; color: var(--gold); font-weight: 700; }
+
+    /* STAR stories */
+    .star-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .star-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 20px;
+      animation: fadeUp .4s ease both;
+    }
+
+    .star-theme {
+      font-weight: 700; font-size: 14px; color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .star-reason { font-size: 12px; color: var(--muted); line-height: 1.65; }
+
+    /* dos / donts */
+    .dos-donts {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media(max-width:540px){ .dos-donts { grid-template-columns: 1fr; } }
+
+    .do-card, .dont-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px 22px;
+    }
+
+    .do-card { border-top: 2px solid var(--green); }
+    .dont-card { border-top: 2px solid var(--red); }
+
+    .dd-title {
+      font-weight: 700; font-size: 12px;
+      letter-spacing: .1em; text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .do-card .dd-title { color: var(--green); }
+    .dont-card .dd-title { color: var(--red); }
+
+    .dd-item {
+      display: flex; gap: 8px; align-items: flex-start;
+      font-size: 13px; color: #b8b4ac;
+      margin-bottom: 8px; line-height: 1.65;
+    }
+
+    .do-card .dd-item::before  { content: '✓'; color: var(--green); flex-shrink: 0; }
+    .dont-card .dd-item::before { content: '✗'; color: var(--red); flex-shrink: 0; }
+
+    /* ask them */
+    .ask-list { margin-bottom: 20px; }
+
+    .ask-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 22px;
+      margin-bottom: 10px;
+      display: flex; gap: 16px; align-items: flex-start;
+      animation: fadeUp .4s ease both;
+    }
+
+    .ask-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--gold-dim);
+      line-height: 1;
+      flex-shrink: 0;
+      padding-top: 2px;
+    }
+
+    .ask-q { font-size: 14px; color: #fff; margin-bottom: 6px; line-height: 1.5; }
+    .ask-intent { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* error */
+    .err {
+      background: #1e1010;
+      border: 1px solid #5a2020;
+      border-radius: var(--r);
+      padding: 20px 24px;
+      color: var(--red);
+      font-size: 14px;
+    }
+
+    /* scraped pills */
+    .scraped { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .sc-pill {
+      font-size: 10px; padding: 2px 8px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="hero">
+  <p class="eyebrow">Interview Prep Agent</p>
+  <h1>用数据<span>赢得</span><br>每次面试</h1>
+  <p class="hero-sub">输入目标公司，Agent 自动分析企业文化，生成专属于这家公司的面试准备方案。</p>
+</div>
+
+<div class="panel">
+  <div class="input-card">
+    <div class="fields">
+      <div class="field">
+        <label>公司名称</label>
+        <input id="company" type="text" placeholder="例：Anthropic" />
+      </div>
+      <div class="field">
+        <label>官网 URL</label>
+        <input id="website" type="text" placeholder="例：anthropic.com" />
+      </div>
+      <div class="field">
+        <label>应聘职位（选填）</label>
+        <input id="job" type="text" placeholder="例：Product Manager" />
+      </div>
+    </div>
+    <button class="go-btn" id="go">
+      <span id="btn-text">开始分析</span>
+    </button>
+
+    <div class="progress" id="progress">
+      <div class="prog-step" id="p1"><div class="prog-dot"></div>正在抓取官网页面…</div>
+      <div class="prog-step" id="p2"><div class="prog-dot"></div>识别企业文化信号…</div>
+      <div class="prog-step" id="p3"><div class="prog-dot"></div>GPT 生成面试准备方案…</div>
+    </div>
+  </div>
+</div>
+
+<div id="report"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+
+function setStep(n) {
+  ['p1','p2','p3'].forEach((id,i) => {
+    const el = $(id);
+    el.className = 'prog-step' + (i+1<n?' done':i+1===n?' active':'');
+  });
+}
+
+$('go').addEventListener('click', async () => {
+  const company = $('company').value.trim();
+  const website = $('website').value.trim();
+  const job     = $('job').value.trim();
+  if (!company || !website) { alert('请填写公司名称和官网 URL'); return; }
+
+  $('go').disabled = true;
+  $('btn-text').textContent = '分析中…';
+  $('progress').classList.add('show');
+  $('report').className = '';
+  $('report').innerHTML = '';
+  setStep(1);
+
+  const t1 = setTimeout(() => setStep(2), 2000);
+  const t2 = setTimeout(() => setStep(3), 4000);
+
+  try {
+    const res  = await fetch('/research', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ company, website, job_title: job }),
+    });
+    const data = await res.json();
+    clearTimeout(t1); clearTimeout(t2);
+    if (!res.ok || data.error) { renderErr(data.error || '请求失败'); }
+    else { setStep(4); renderReport(data); }
+  } catch(e) {
+    clearTimeout(t1); clearTimeout(t2);
+    renderErr('无法连接到后端，请确认 Flask 已在 localhost:5000 运行。');
+  }
+
+  $('go').disabled = false;
+  $('btn-text').textContent = '重新分析';
+});
+
+function renderErr(msg) {
+  $('report').className = 'show';
+  $('report').innerHTML = `<div class="err" style="max-width:860px;margin:0 auto;padding:0 24px 60px"><div class="err">⚠ ${esc(msg)}</div></div>`;
+}
+
+function renderReport(d) {
+  const bg = d.background || {};
+  const ip = d.interview_prep || {};
+  const lq = ip.likely_questions || [];
+  const ss = ip.star_stories || [];
+  const dos= ip.dos || [];
+  const dts= ip.donts || [];
+  const qa = d.questions_to_ask || [];
+  const cs = d.culture_signals || [];
+
+  let html = `<div style="max-width:860px;margin:0 auto;padding:0 24px 80px">`;
+
+  // ── snapshot
+  html += `<div class="snapshot">
+    <div>
+      <div class="co-name">${esc(d.company_name||'')}</div>
+      <div class="co-liner">${esc(d.one_liner||'')}</div>
+      <div class="meta-chips">
+        ${bg.industry?`<span class="chip">🏭 ${esc(bg.industry)}</span>`:''}
+        ${bg.founded&&bg.founded!=='未知'?`<span class="chip">📅 ${esc(bg.founded)}</span>`:''}
+        ${bg.size&&bg.size!=='未知'?`<span class="chip">👥 ${esc(bg.size)}</span>`:''}
+      </div>
+      ${(bg.recent_highlights||[]).length?`
+      <div class="highlights">
+        ${bg.recent_highlights.map(h=>`<div class="highlight-item">${esc(h)}</div>`).join('')}
+      </div>`:''}
+    </div>
+    ${d.pages_scraped?.length?`
+    <div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:.08em;text-transform:uppercase">已抓取</div>
+      <div class="scraped">${d.pages_scraped.map(p=>`<span class="sc-pill">${esc(p)}</span>`).join('')}</div>
+    </div>`:''}
+  </div>`;
+
+  // ── culture signals
+  if (cs.length) {
+    html += `<div class="sec-heading">企业文化信号</div>
+    <div class="culture-grid">`;
+    cs.forEach((c,i) => {
+      html += `<div class="culture-card" style="animation-delay:${i*.07}s">
+        <div class="culture-trait">${esc(c.trait||'')}</div>
+        <div class="culture-evidence">${esc(c.evidence||'')}</div>
+        <div class="culture-angle">${esc(c.interview_angle||'')}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── likely questions (STAR)
+  if (lq.length) {
+    html += `<div class="sec-heading">高概率面试问题 & 回答思路</div><div class="q-list">`;
+    lq.forEach((q,i) => {
+      html += `<div class="q-item" style="animation-delay:${i*.06}s">
+        <div class="q-text">${esc(q.question||'')}</div>
+        <div class="q-why">${esc(q.why_asked||'')}</div>
+        <div class="q-tip">${esc(q.answer_tip||'')}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── STAR stories
+  if (ss.length) {
+    html += `<div class="sec-heading">建议准备的 STAR 故事主题</div><div class="star-grid">`;
+    ss.forEach((s,i) => {
+      html += `<div class="star-card" style="animation-delay:${i*.07}s">
+        <div class="star-theme">${esc(s.theme||'')}</div>
+        <div class="star-reason">${esc(s.reason||'')}</div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // ── dos / donts
+  if (dos.length || dts.length) {
+    html += `<div class="sec-heading">面试中的注意事项</div>
+    <div class="dos-donts">
+      <div class="do-card">
+        <div class="dd-title">应该做</div>
+        ${dos.map(d=>`<div class="dd-item">${esc(d)}</div>`).join('')}
+      </div>
+      <div class="dont-card">
+        <div class="dd-title">避免做</div>
+        ${dts.map(d=>`<div class="dd-item">${esc(d)}</div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  // ── questions to ask
+  if (qa.length) {
+    html += `<div class="sec-heading">你可以问面试官的问题</div><div class="ask-list">`;
+    qa.forEach((q,i) => {
+      html += `<div class="ask-item" style="animation-delay:${i*.07}s">
+        <div class="ask-num">0${i+1}</div>
+        <div>
+          <div class="ask-q">${esc(q.question||'')}</div>
+          <div class="ask-intent">${esc(q.intent||'')}</div>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  $('report').className = 'show';
+  $('report').innerHTML = html;
+  $('report').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
