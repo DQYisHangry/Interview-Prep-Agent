@@ -36,7 +36,7 @@ Built with **Python + Flask + OpenAI GPT-4o**. The system is only able in Mandar
 
 1. **Clone the repo**
    ```bash
-   git clone https://github.com/your-username/interview-prep-agent.git
+   git clone [https://github.com/DQYisHangry/Interview-Prep-Agent.git]
    cd interview-prep-agent
    ```
 
